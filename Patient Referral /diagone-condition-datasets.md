@@ -9,3 +9,5 @@
 - https://www.healthtap.com/questions/7147740-i-have-problem-that-in-left-hand-side-underarm-swollen-and-it-has-light-pain-and-sometimes-it-changi/
 - https://www.healthtap.com/questions/1462702-doctors-problem-in-my-nose-sometimes-in-the-day-my-nose-close-and-it-s-of-a-stale-blood-that-is-clos/
 - https://www.healthtap.com/questions/288514-i-m-having-major-problems-my-head-feels-it-s-going-to-explode-and-it-s-not-a-head-ake/
+- https://altibbi.com/%D8%A7%D8%B3%D8%A6%D9%84%D8%A9-%D8%B7%D8%A8%D9%8A%D8%A9
+- 
