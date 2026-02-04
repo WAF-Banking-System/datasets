@@ -1,0 +1,158 @@
+1. Collect Relevant Research Papers (4–6 papers):
+
+
+Chest Ultrasound:
+
+Chest ultrasound deep learning segmentation:
+Title:	Deep learning for real-time multi-class segmentation of artefacts in lung ultrasound
+Authors:	Lewis Howell et al.
+Year:	2024
+Problem:	Enhancing segmentation of lung ultrasound artefacts for better interpretation
+Methods	:Lightweight deep learning segmentation + transfer learning
+Dataset:	Phantom LUS + small clinical set (pleural effusion/consolidation)
+Performance:	Dice ~0.74 (phantom), real-time up to 33.4 FPS
+Limitations:	Lower performance on real clinical data, small dataset, lack of detailed architecture disclosure
+link:https://www.sciencedirect.com/science/article/pii/S0041624X24000131  
+
+Lung ultrasound deep learning classification:
+Title:	Deep Learning-Based Classification of Reduced Lung Ultrasound Data from COVID-19 Patients
+Author:s	Umair Khan, Federico Mento, Lucrezia Nicolussi Giacomaz, Riccardo Trevisan, Andrea Smargiassi, Riccardo Inchingolo, Tiziano Perrone, Libertario Demi
+Year:	2022
+Problem Addressed:	Automatic classification of lung ultrasound images and evaluation of how reducing image resolution and gray-level depth affects deep learning performance, especially in low-resource settings.
+Methods: Used	CNN-based deep learning classification model for automatic lung ultrasound severity scoring. No explicit U-Net architecture is reported.
+Dataset:	448 lung ultrasound video frames from 34 examinations of 20 COVID-19 patients.
+Main Findings / Performance:	Classification performance remains stable when reducing gray-level depth. Overall agreement with reference scores ranges from approximately 73.5% to 82.3%, even with significantly reduced data size.
+Limitations	Small dataset size, focus only on classification (no segmentation), limited architectural comparison, and validation mainly on COVID-19 lung ultrasound data
+link:https://ieeexplore.ieee.org/abstract/document/9740147
+
+Deep learning pneumonia chest ultrasound:
+Title	D:evelopment and testing of a deep learning algorithm to detect lung consolidation among children with pneumonia using hand-held ultrasound
+Authors	:David Kessler, Meihua Zhu, Cynthia R. Gregory, Courosh Mehanian, Jailyn Avila, Nick Avitable, Di Coneybeare, Devjani Das, Almaz Dessie, Thomas M. Kennedy, et al.
+Year:	2024
+Problem Addressed:	Automatic detection of lung consolidation from pediatric LUS to support pneumonia diagnosis
+Methods: Used	Deep learning classification/detection model trained on annotated LUS videos
+Dataset:	117 exams from 107 pediatric participants yielding 604 positive and 589 negative LUS videos
+Main Findings / Performance:	Overall accuracy ~88.5%, sensitivity ~88%, specificity ~89 • high performance for consolidation detection
+Limitations:	Focused only on consolidation, pediatric population, limited architectural details, generalization needs further validation
+link: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0309109
+
+Abdomen Ultrasound:
+
+Abdominal ultrasound deep learning segmentation:
+Title:	Automated Abdominal Segmentation of CT Scans for Body Composition Analysis Using Deep Learning
+Authors:	A. D. Weston, P. Korfiatis, T. Kline, et al.
+Year:	2019
+Problem: Addressed	Development of a fully automated algorithm to segment abdominal structures on medical imaging (CT), quantifying body composition (e.g., adipose tissue, muscle, organs) with deep learning rather than manual measurements.
+Methods :Used	Deep learning–based semantic segmentation with convolutional neural networks (CNNs), typically architectures like U-Net or similar encoder–decoder networks for pixel-level classification of tissue compartments (e.g., SAT, VAT, muscle).
+Dataset:	Retrospective collection of abdominal CT scans from Mayo Clinic patients; segmented into tissues such as subcutaneous adipose tissue (SAT), visceral adipose tissue (VAT), muscle, bone, etc. (Exact sample size and scanner details are in original article but not in the citation listings).
+Main Findings / Performance	:The model accurately segmented abdominal body composition components (SAT, VAT, muscle, etc.) with high Dice similarity scores (often >0.90) and high intra-class correlations for quantification compared with expert annotations.
+Limitations	: Focuses on CT, not ultrasound (important to note since the DOI was in Radiology but the modality is CT).
+ Not specific to ultrasound of abdomen or chest.
+ The paper does not detail real-time performance or resource-constrained inference.
+Link:https://pubs.rsna.org/doi/abs/10.1148/radiol.2018181432
+
+liver ultrasound deep learning measurement:
+Title:	Deep Learning Techniques for Fatty Liver Using Multi-View Ultrasound Images Scanned by Different Scanners: Development and Validation Study
+Authors:	Taewoo Kim, Dong Hyun Lee, Eun-Kee Park, Sanghun Choi
+Year:	2021
+Problem Addressed:	Automating detection and quantification of fatty liver from ultrasound instead of MRI
+Methods: Used	CNN (VGG19), transfer learning, data augmentation, Grad-CAM, SHAP
+Dataset	:180 images (90 liver + 90 combined) from 39 fatty liver and 51 normal subjects
+Main Findings / Performance	:~80% accuracy for fatty liver detection, moderate R² (~0.633) for fat fraction prediction
+Limitations:	Small dataset, limited architecture comparison, imaging variability across scanners
+link:https://medinform.jmir.org/2021/11/e30066/
+
+
+
+2. Survey Available Ultrasound Datasets:
+
+Abdomen Ultrasound:
+link:https://www.kaggle.com/datasets/ignaciorlando/ussimandsegm
+Number of images / patients:
+Approximately 926 labeled ultrasound images
+(≈ 633 training images and ≈ 293 testing images)
+Labels / Annotations:Pixel-wise semantic segmentation masks
+Multi-class annotations for several abdominal anatomical structures
+(e.g., liver, kidneys, spleen, pancreas, blood vessels, etc.)
+Image resolution / quality:Grayscale B-mode ultrasound images
+Exact resolution is not officially documented
+Typical ultrasound image quality with speckle noise, suitable for segmentation tasks
+License / usage restrictions:Distributed via Kaggle
+Usage is subject to Kaggle’s dataset terms
+No clearly stated open-source or commercial-use license
+  
+link: https://www.kaggle.com/datasets/orvile/annotated-ultrasound-liver-images-dataset
+Number of Images / Patients:735 images total based on how the dataset is used in research (e.g., 435 malignant + 200 benign + 100 normal = 735
+Labels / Annotations: Benign/Malignant/Normal + outlines of liver & masses
+Image Resolution / Quality :average (range ~440×341 up to ~1388×910)
+License / Usage Restrictions: CC BY 4.0
+Potential Strengths:Annotated for segmentation & classification
+PotentialPotential: Small size, limited metadata         
+
+                                                                                           
+Chest Ultrasound:
+link:https://www.kaggle.com/datasets/orvile/lung-ultrasound-imaging-dataset
+Number of images / patients:401 images and 255 patients                                                                                           
+Labels or annotations provided:Polygonal bounding boxes for vertical artifacts                                                                                           
+Image resolution / quality:High-resolution
+License or usage restrictions:CC BY 4.0
+Potential strengths: Good for annotations & AI training
+Potential Potential: Moderate size, specific annotation focus
+
+A comparison table of ultrasound datasets with pros/cons:
+
+     datasets:                    pros :                                                        cons:                            
+   ussimandsegm               Provides both real and synthetic data;                        Synthetic images may lack the complex "noise" 
+                                                                                               found in real clinical environments.
+                                 excellent for training models 
+                              to outline organs (Segmentation).
+                                                                                           
+
+  
+annotated-ultrasound         High-quality labels (Normal, Benign,                          Limited strictly to liver pathologies; does not cover other abdominal organs
+                          Malignant); perfect for diagnostic accuracy. 
+
+
+
+
+
+lung-ultrasound              Very relevant for emergency triage                                Lung ultrasound is technically difficult and contains many artifacts that can confuse simple AI models.
+                           (e.g., COVID-19 or pneumonia symptoms).
+
+
+3. Identify Research Gaps:
+
+                                           Research Gaps in Ultrasound Image Analysis:                                                
+
+What is Commonly Addressed ?
+* Deep Learning Architectures: Most research heavily utilizes established CNN-based models (like U-Net for segmentation and ResNet/VGG for classification) to identify liver lesions or lung B-lines
+* Static Image Performance: There is a high volume of work focused on achieving high accuracy on static, curated datasets (e.g., classifying a single image as "benign" or "malignant")
+* Specialized Organs: Significant progress has been made in organ-specific tasks, particularly for breast, liver, and lung (COVID-19 related) analysis                                                                                         
+What is Missing (Research Gaps)
+* Real-time Processing and Hardware Acceleration: While papers often mention clinical utility, few provide end-to-end implementations optimized for GPU/FPGA acceleration to support real-time scanning (e.g., >30 FPS). Most models are too computationally expensive for portable or handheld ultrasound devices, creating a gap between "model accuracy" and "bedside usability."
+* Dataset Diversity and Generalizability: Existing datasets (like those from Kaggle) often suffer from "Domain Shift." Models trained on one dataset (e.g., the Liver Ultrasound dataset) frequently fail when tested on images from different manufacturers (e.g., GE vs. Philips) or different patient demographics (BMI variability), as current research lacks cross-vendor validation                                                                                       
+* Lack of Video-Based Spatiotemporal Analysis: Most current research treats ultrasound as a series of still frames. However, ultrasound is an inherently dynamic modality. There is a significant gap in using temporal information (video sequences) to reduce noise and improve segmentation stability, which is crucial for moving organs like the lungs or the heart.                                                                                           
+
+
+
+4. Suggest Potential Dataset & Use Case :
+
+                                                                                           
+Recommendation:
+It is recommended to use a combination of publicly available medical text and imaging datasets.
+For the AI chatbot and clinical decision support component, datasets such as MIMIC-III or MIMIC-IV, 
+which contain clinical notes, diagnoses, and medication records, are suitable for text classification and recommendation tasks. 
+These datasets enable the AI system to analyze patient symptoms and uploaded medical reports to identify the most appropriate medical specialty and suggest possible actions for the doctor.
+For medical imaging, lung ultrasound datasets available on Kaggle can be used, which are suitable for classification and anomaly detection tasks to identify abnormal findings. 
+This dataset selection aligns well with the project goals of managing medical records, supporting doctors in decision-making, and providing an intelligent, integrated healthcare system for both patients and clinicians.
+
+
+
+
+
+
+
+
+                                                                                           
+
+
