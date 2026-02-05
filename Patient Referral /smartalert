@@ -1,0 +1,49 @@
+# SmartAlert: Implementing Machine Learning-Driven Clinical Decision Support for Inpatient Lab Utilization Reduction
+
+---
+
+## Introduction
+
+More than 7 billion clinical lab tests are performed annually in the United States1, and 20-50% of inpatient lab tests are medically unnecessary2–4, contributing to patient harms including worsening anemia5–7, sleep disruption8, and increased healthcare costs9. The Society of Hospital Medicine identifies routine complete blood counts (CBC) as a wasteful practice in their “Choosing Wisely” list10. Existing mitigation strategies, including clinician education, audit and feedback, financial incentives, and broad ordering restrictions, have limited precision and efficacy11,12. Clinician cognitive overload and concerns for patient safety pose persistent barriers to reducing lab overutilization13–15.
+
+In late 2021, global supply chain disruptions related to the COVID-19 pandemic resulted in critical shortages of blood collection tubes and overt nationwide rationing16, highlighting these issues. Our institution implemented ordering restrictions that limited the duration of standing lab draws to 72 hours. While successful in reducing lab testing, this intervention blocked repeat testing even for patients undergoing dynamic clinical change. A more precise approach to safely reduce unnecessary laboratory testing is needed.
+
+Advances in machine learning (ML) provide a promising avenue for addressing this challenge by offering clinicians patient-specific identification of low-value lab testing14,17, but real-world use remains limited by technical, operational, and clinical barriers. We introduce SmartAlert, a novel ML-driven real-time clinical decision support (CDS) tool integrated into the electronic health record (EHR). We describe the implementation process, challenges, and lessons learned from our randomized deployment of a SmartAlert targeting repetitive inpatient CBCs and its impact on CBC testing rates and secondary safety outcomes.
+
+---
+
+## Prediction Trigger
+
+Using standard EHR functions, predefined user actions – such as ordering a lab with daily or higher frequency – can be used to trigger a RESTful (Representational State Transfer) HTTP (Hypertext Transfer Protocol) web request to an Azure (Microsoft Corporation, Redmond, WA) serverless function for a custom prediction calculation. Given that data retrieval could take several minutes, we opted to systematically trigger predictions in advance for all admitted patients at regular 6-hour intervals.
+
+---
+
+## DEPLOYR Framework
+
+The DEPLOYR framework allows for SmartAlerts to initiate real-time patient data extraction, perform custom prediction calculation, and write back or trigger an intervention in the EHR. The process begins in response to a system generated web request - in this case a 6-hour timer - and ends with stability prediction being stored in a custom flowsheet. Classic CDS alerts (OPA Our Practice Advisory) then display in response to clinicians ordering repetitive labs.
+
+---
+
+## Clinician Engagement
+
+To ensure usability and clinician trust, we conducted semi-structured interviews (Supplemental S1) prior to implementation (Figure 2). Trainees, attending physicians, and advanced practice providers with inpatient work experience from all specialties were invited to participate on a voluntary basis using public mailing lists, with additional convenience and purposive sampling performed through targeted outreach. 18 clinicians from Internal Medicine/Hospital Medicine, Neurology, Critical Care, General Surgery, Orthopedic Surgery, Hematology/Oncology, Urology, and Otolaryngology participated.
+
+While earlier iterations of model development aimed to predict whether a lab result would be “normal,” clinician stakeholders indicated that predicting “clinical stability” of a test was more meaningful14. Using the 18 participants’ definitions of “clinically stable” lab values, we determined the stability thresholds for components of the CBC using absolute minima/maxima and acceptable directional relative changes (Supplemental S2). Using these thresholds, the CBC utilization SmartAlert underwent silent prospective evaluation between March 8 and March 14, 2024, operating in real time without triggering OPA displays. This confirmed that model PPV remained near the goal of 90% (e.g. 88.1%, 95.4%, and 93% for white blood cell count, hemoglobin, and platelet count, respectively).
+
+Qualitative feedback from clinician interviews was inductively coded with consensus. These revealed favorable attitudes toward the use of ML in the alert with high trust and positive sentiment (Figure 3a). Many participants indicated that knowing the model’s PPV was most helpful, while being ambivalent on the need to disclose the role of ML (Figure 3b-d). Additional feedback was iteratively incorporated into the design (Supplemental S4).
+
+---
+
+## Governance and FURM Assessment
+
+Following our institution’s governance process on clinical ML/AI tools, we submitted the CBC utilization SmartAlert for FURM assessment by the Data Science team at Stanford Health Care. The FURM framework, described in detail in Callahan et al19, is a standardized process involving the project team, relevant stakeholders, and experts in AI model evaluation to assess the potential utility and impact of ML/AI-powered clinical applications. Their findings were reviewed by our institution’s Data Science Executive Committee, including leaders from information technology, clinical informatics, and clinical operations, for final approval of enterprise deployment of the CBC utilization SmartAlert.
+
+---
+
+## References
+
+1. [Reference 1]  
+2. [Reference 2]  
+3. [Reference 3]  
+4. Callahan et al., *FURM framework for clinical AI evaluation*  
+5. Supplemental S1-S4, SmartAlert study
