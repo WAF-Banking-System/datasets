@@ -24,6 +24,7 @@ The paper surveys multiple approaches:
 * Hybrid approaches combining rules with ML
 * Recent approaches using pretrained language models (e.g., BERT variants trained on clinical text)
 
+
 ### What data does it work on?
 
 * Clinical notes
