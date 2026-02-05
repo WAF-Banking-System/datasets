@@ -1,0 +1,97 @@
+# LabTOP: A Unified Model for Lab Test Outcome Prediction on Electronic Health Records
+
+---
+
+## 1. Introduction
+
+Electronic Health Records (EHR) are essential to modern healthcare systems, serving as comprehensive databases of patient data, including treatments, clinical interventions, and lab test results (Gunter and Terry, 2005). These records provide a longitudinal view of a patient’s medical history, allowing for the tracking of individual health trends (Kruse et al., 2017). Among them, lab test results play a particularly important role by capturing numerical changes in key biomarkers, such as blood glucose and creatinine. These results reflect a patient’s physiological and pathological state, supporting the management of disease and the assessment of treatment efficacy (Sikaris, 2017; Cabalar et al., 2024).
+
+Despite their clinical importance, conducting lab tests often faces challenges in real-world settings. For instance, the need for frequent lab tests in unstable patients conflicts with the increased distress they experience from repeated invasive procedures, creating a trade-off between clinical necessity and patient burden (Ambasta et al., 2019; Zhi et al., 2024). Additionally, some tests often take significant time to obtain results, making it difficult to assess the patient’s condition promptly (Shiferaw and Yismaw, 2019). As a result, there are limitations in comprehensively assessing a patient’s condition from multiple perspectives through various lab tests, forcing healthcare providers to rely solely on the available test results to make clinical judgments. This challenge highlights the need for methods to estimate lab test results without conducting the actual tests, allowing healthcare providers to understand a patient’s condition comprehensively through the predicted lab test results.
+
+Meanwhile, the advancement of machine learning has greatly contributed to healthcare for several clinical prediction tasks such as readmission, mortality risk, and length of hospital stay (Song et al., 2018; Xiao et al., 2018; Hur et al., 2022, 2023; Kim et al., 2023; Wornow et al., 2023; Renc et al., 2024). While previous studies have demonstrated the value of lab test data in supporting clinical decisions, efforts to estimate various lab test results within a single unified model have been limited. Notably, most prior studies approach lab test outcome prediction by classifying discrete levels of a small subset of selected lab items (Hur et al., 2023; Kim et al., 2023; Wornow et al., 2023). Even among studies that attempt to estimate continuous values, they are specifically designed for only a few selected lab tests rather than whole set of lab items (Zhi et al., 2024; Jiang et al., 2024; Duan et al., 2020; Liu et al., 2023; Fu et al., 2023; Langarica et al., 2024). On the other hand, some works on irregularly sampled time-series models have explored the prediction of multiple lab measurements using neural ODE-based approaches (Rubanova et al., 2019; Schirmer et al., 2022). These methods estimate multiple lab values within a unified framework; however, they primarily focus on modeling the dynamics of lab test results alone, without incorporating the broader medical events present in EHRs, such as medications and input events. This narrow focus limits their practical applicability in clinical settings, where precise numerical predictions for a broader range of lab test results can facilitate early intervention and support more informed clinical decision-making across diverse medical conditions.
+
+---
+
+## 2. Data Representation
+
+In EHR data, patient medical events that occur in a hospital, such as lab tests and prescriptions, are recorded in a structured format. Thus, we can represent a patient \(P\) as a sequence of medical events \([M_1, ..., M_N]\), where \(N\) is the total number of medical events, and \(M_i\) is the i-th medical event for the patient. Each medical event typically includes a timestamp, medical event codes (e.g., ICD, LOINC, RxNorm), a numerical value, and its corresponding unit of measurement. Accordingly, the i-th medical event \(M_i\) can be represented as a 5-tuple of event features \((t_i, e_i, c_i, v_i, u_i)\), where \(t_i\) represents the timestamp of the event, \(e_i\) stands for the type of the event (e.g., “labevent”, “prescription”), \(c_i\) is the corresponding medical code (e.g., “2160-0”), \(v_i\) denotes the measured values (e.g., 1.2), and \(u_i\) is the associated unit of measurement.
+
+---
+
+## 3. Model Architecture
+
+We design our model following the GPT-2 architecture (Radford et al., 2019), which is composed of Transformer decoder layers (Vaswani, 2017). Specifically, the input sequence \(x\) is embedded into a sequence of latent vectors \(X ∈ ℝ^{M×h}\) by the learnable embedding layer, where \(M\) is the length of the input token sequence and \(h\) is the hidden dimension of the model. They are then fed into the Transformer decoder to model the conditional probability of the next token given the previous sequence, following an autoregressive language modeling approach.
+
+**Objective:** Unlike traditional language modeling where the objective is to predict the next token for every position in the sequence, we modify the loss computation to focus exclusively on lab test outcome prediction. That is, instead of computing the loss for all tokens, we selectively compute the loss only on the tokens corresponding to lab test values, encouraging the model to focus on accurately predicting lab test outcomes while still benefiting from a broader contextual understanding of the patient’s medical history. Accordingly, the loss is defined as:
+
+\[
+L = - \sum_{i \in I_\text{lab}} \log p(x_i | x_{<i}; \theta)
+\]
+
+where \(I_\text{lab}\) represents the set of token positions corresponding to lab test values along with their unit of measurements, as well as their special [EOE] token.
+
+---
+
+## 4. Lab Test Outcome Prediction
+
+We formulate the lab test outcome prediction task as a language modeling task to predict numeric values token-by-token in an autoregressive manner. That is, the model generates the corresponding numeric value of a target lab item given the sequence of prior medical events and the target lab item’s name. Accordingly, to construct inference samples, we extract every lab item appearing in the input sequence and build a corresponding inference prompt. Specifically, for each target lab test item occurring at timestamp \(t_k\), we concatenate all prior medical events up to \(t_k\) along with the target lab test’s textual representation \(e_k\) and \(d_k\) to create an inference sequence. Thus, the k-th inference sample of a patient is defined as:
+
+\[
+x^{(k)}_\text{test} = f(D, t_i < t_k [t_i, m_i, [EOE]], [t_k, e_k, d_k])
+\]
+
+where \(e_k\) and \(d_k\) denote the event type (i.e., “labevent”) and textual description of the target lab test (e.g., “bicarbonate”). Once the inference sequence is constructed, it is fed into the trained model, which generates tokens autoregressively until the [EOE] token is encountered. In this process, our primary objective is to accurately predict the outcome value of a specific lab test at a given timestamp rather than probabilistically generating potential future lab tests. Thus, to ensure precise predictions, we do not sample from the model’s output distribution but instead select the most probable token (i.e., top-1 token) at each decoding step. The generated sequence is then decoded back into a numerical value (e.g., `2 4 . 0 meq / l → 24.0 meq/l`).
+
+---
+
+## 5. Datasets
+
+HiRID is a high-resolution ICU dataset collected from the Bern University Hospital in Switzerland, composed of 33,905 ICU patients. For all these datasets, we take the ICU records whose length of stay is at least 6 hours. We then randomly split them into training, validation, and test sets in an 8:1:1 ratio based on their patient IDs, and treat each ICU record as an individual sample for our model. Detailed dataset statistics are described in Appendix A.
+
+To determine which types of EHR events should be involved for lab test outcome prediction, we categorized EHR events into two broad types:  
+1. **Observation-type events**: represent the patient’s physiological state (e.g., lab tests, microbiology tests).  
+2. **Intervention-type events**: correspond to medical treatments, prescriptions, and procedures administered during the ICU stay.
+
+We then prioritized these event types based on their expected influence on lab test results:  
+- Firstly, **medication events** that directly reflect the patient’s physiological status.  
+- Secondly, **other intervention-related events**, including input events and procedure events.  
+- Lastly, **observation-type events** that do not directly alter a patient’s state but provide useful contextual information.
+
+**Note:** HiRID collected every observation-type event into one table, leading to multiple types of events in a single table. We select **only events explicitly identified as lab tests**, and for clinical relevance, we select only the **medical items accounting for the top 90% of occurrences** within their respective tables for each dataset.
+
+---
+
+## 6. Baselines
+
+To demonstrate the effectiveness of LabTOP, we compare its performance with the following baseline methods:
+
+- **Naive**: predicts lab test value at a given timestamp using the most recent measured value of the same lab test.  
+- **Naive(µ)**: predicts the lab test value by averaging all previously recorded values before the prediction timestamp.  
+- **GenHPF (Hur et al., 2023)**: a multi-task learning model incorporating hierarchical patient features, adapted for regression on lab tests.  
+- **XGBoost (Chen and Guestrin, 2016)**: gradient boosting on structured data, using statistics of past measurements like count and mean.  
+- **GPT-4o and GPT-4o-mini**: general-purpose LLMs, evaluated on a 10% sample of the test set due to token limits. All experiments used HIPAA-compliant GPT models on Azure.
+
+---
+
+## 7. Performance Reporting
+
+Lab test outcome prediction performances are reported across different EHR datasets. Mean and 95% confidence intervals are computed across 3 random seeds for trainable models (e.g., GenHPF, XGBoost, LabTOP). The **best performances for each dataset are highlighted in boldface**.
+
+---
+
+## References
+
+1. Gunter, T., & Terry, N. (2005). The emergence of national electronic health record architectures in the United States and Australia.  
+2. Kruse, C. S., et al. (2017). The use of electronic health records to support population health: A systematic review.  
+3. Sikaris, A. (2017). Laboratory medicine and clinical decision-making.  
+4. Cabalar, P., et al. (2024). …  
+5. Song, X., et al. (2018). …  
+6. Xiao, C., et al. (2018). …  
+7. Hur, J., et al. (2022, 2023). …  
+8. Kim, D., et al. (2023). …  
+9. Wornow, M., et al. (2023). …  
+10. Renc, J., et al. (2024). …  
+11. Radford, A., et al. (2019). GPT-2: Language models are unsupervised multitask learners.  
+12. Vaswani, A., et al. (2017). Attention is all you need.  
+13. Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting system.  
+
